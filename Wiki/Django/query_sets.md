@@ -1,20 +1,27 @@
-## Tables
-
-`Verbose name` is an option first positional parameter for all field except relational ones, for those you need to provide 
-it using `verbose_name` keyword argument.
-
-`blank and null`: `null` is purely `database-related`, whereas `blank` is `validation-related`. If a field has 
-blank=True, form validation will allow entry of an empty value.
-
-#### Table Names
-Table names are automatically derived from Django app that you created, followed by underscore and model name.
-To override the database table name, use the `db_table` parameter in `class Meta`.
-
-```markdown
-For example, if you have an app bookstore (as created by manage.py startapp bookstore), a model defined as class 
-Book will have a database table named bookstore_book.
-```
 ## Query sets
+A QuerySet represents a collection of objects from your database. QuerySets are lazy – the act of creating a 
+QuerySet doesn’t involve any database activity and Django won’t actually run the query until the QuerySet is evaluated.
+Query sets can be limited i.e `A.objects.all()[:5]` 
+
+### Saving Foreign Key & ManyToManyFields
+You can save object via foreign key relation by assigning respective object and calling save method. i.e 
+`book.author = author_1` then `book.save()`. 
+
+For ManyToMany field use add method i.e `book.publishers.add(pub_1)` for multiple objects `book.publishers.add(pub_1, pub_2)`
+### Field Lookups
+Basic lookups keyword arguments take the form `field__lookuptype=value`. (That’s a double-underscore) in case 
+of a ForeignKey you can specify the field name suffixed with _id.
+
+Lookup types : `exact, iexact, lte, contains, startswith, endswith`
+### Filters
+Filters narrow down the query results based on the given parameters. `filter(**kwargs)` Returns a new QuerySet containing objects that match the given lookup parameters.
+`exclude(**kwargs)` Returns a new QuerySet containing objects that do not match the given lookup parameters.
+You can chain (refine) multiple filters, Each time you refine a QuerySet, you get a brand-new QuerySet that is in no 
+way bound to the previous QuerySet.
+
+For multivalued relationships, everything inside a single filter is applied simultaneously to filter out items 
+matching all those requirements. Successive filter() calls further restrict the set of objects, but for multi-valued 
+relations, they apply to any object linked to the primary model, not necessarily those objects that were selected by an earlier filter() call.
 
 ### Aggregate
 Following are aggregate operations that can be perfomed on a 
@@ -76,7 +83,10 @@ books written by both authors.
 >>> Author.objects.values('name').annotate(average_rating=Avg('book__rating'))
 ```
 
-
-
 It’s difficult to intuit how the ORM will translate complex querysets into SQL queries so when in doubt, 
 inspect the SQL with `str(queryset.query)` and write plenty of tests
+
+### F() expressions
+When Django encounters an instance of F(), it overrides the standard Python operators to create an 
+encapsulated SQL expression, which make it possible to perform operation on DB level instead of pulling object from 
+DB to python memory.
