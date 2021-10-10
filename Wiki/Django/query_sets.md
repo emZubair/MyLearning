@@ -12,6 +12,9 @@ For ManyToMany field use add method i.e `book.publishers.add(pub_1)` for multipl
 Basic lookups keyword arguments take the form `field__lookuptype=value`. (That’s a double-underscore) in case 
 of a ForeignKey you can specify the field name suffixed with _id.
 
+`F expressions` can then be used in query filters to compare the values of two different fields on the same model instance.
+You can also use the double underscore notation to span relationships in an F() object.
+
 Lookup types : `exact, iexact, lte, contains, startswith, endswith`
 ### Filters
 Filters narrow down the query results based on the given parameters. `filter(**kwargs)` Returns a new QuerySet containing objects that match the given lookup parameters.
