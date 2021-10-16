@@ -6,6 +6,18 @@ Django provides three most common types of relationships `many-to-one`, `many-to
 To define a many-to-one relationship, use `django.db.models.ForeignKey` which requires a positional argument: the 
 class to which the model is related. Reverse look up uses model name in lower case appended by underscore and set 
 keyword `book_set`
+
+Forward access to one-to-many relationships is cached the first time the related object is accessed. 
+Subsequent accesses to the foreign key on the same object instance are cached.
+```shell
+>>> e = Entry.objects.get(id=2)
+>>> print(e.blog)  # Hits the database to retrieve the associated Blog.
+>>> print(e.blog)  # Doesn't hit the database; uses cached version.
+# Note that the select_related() QuerySet method recursively prepopulates the cache of all one-to-many relationships ahead of time.
+>>> e = Entry.objects.select_related().get(id=2)
+>>> print(e.blog)  # Doesn't hit the database; uses cached version.
+>>> print(e.blog)  # Doesn't hit the database; uses cached version.
+```
 2. #### Many-to-Many relationships
 To define a many-to-many relationship, use `ManyToManyField`, which requires a positional argument: the 
 class to which the model is related. It’s suggested, but not required, that the name of a ManyToManyField be a 
@@ -45,10 +57,15 @@ class Membership(models.Model):
     invite_reason = models.CharField(max_length=64)
 ```
 When you set up the intermediary model, you explicitly specify foreign keys to the models that are involved 
-in the many-to-many relationship
+in the many-to-many relationship.
+
+Both ends of a many-to-many relationship get automatic API access to the other end. The API works similar to a
+“backward” one-to-many relationship, The model that defines the ManyToManyField uses the attribute name of that 
+field itself, whereas the “reverse” model uses the lowercased model name of the original model, plus '_set' 
 3. ### One-to-one relationships
 `OneToOneField` is used to define this, This is most useful on the primary key of an object when that object 
-“extends” another object in some way.
+“extends” another object in some way.  If you define a OneToOneField on your model, instances of that model 
+will have access to the related object via an attribute of the model and reverse model can access via lower cased model name.
 
 `Note` If you need to create a relationship on a model that has not yet been defined, you can use the name of 
 the model, rather than the model object itself. i.e `manufacturer = models.ForeignKey('Manufacturer', on_delete=models.CASCADE)`

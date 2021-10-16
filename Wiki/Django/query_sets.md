@@ -3,6 +3,17 @@ A QuerySet represents a collection of objects from your database. QuerySets are 
 QuerySet doesn’t involve any database activity and Django won’t actually run the query until the QuerySet is evaluated.
 Query sets can be limited i.e `A.objects.all()[:5]` 
 
+You can execute a queryset by `iteration`, `repr()`, `len()`, `bool()` using queryset in if statement, 
+If there is at least one result, the QuerySet is True, otherwise False 
+`NOTE`: If you only need to determine the number of records in the set (and don’t need the actual objects), 
+it’s much more efficient to handle a count at the database, Django provides a `count()` method for precisely 
+this reason. `Entry.objects.count()` or `Entry.objects.filter(headline__contains='Lennon').count()`
+
+
+Slicing an unevaluated QuerySet usually returns another unevaluated QuerySet modifying it further 
+(e.g., adding more filters, or modifying ordering) is not allowed, but Django will execute the database 
+query if you use the “step” parameter of slice syntax, and will return a list. 
+
 ### Saving Foreign Key & ManyToManyFields
 You can save object via foreign key relation by assigning respective object and calling save method. i.e 
 `book.author = author_1` then `book.save()`. 
@@ -16,16 +27,85 @@ of a ForeignKey you can specify the field name suffixed with _id.
 You can also use the double underscore notation to span relationships in an F() object.
 
 Lookup types : `exact, iexact, lte, contains, startswith, endswith`
+
+### Caching and QuerySets
+Each QuerySet contains a cache to minimize database access, The first time a QuerySet is evaluated – and, hence, a 
+database query happens – Django saves the query results in the QuerySet’s cache and returns the results that have been 
+explicitly requested (e.g., the next element, if the QuerySet is being iterated over). 
+
+Limiting the queryset using an array slice or an index will not populate the cache. However, if the entire queryset 
+has already been evaluated, the cache will be checked instead:
+
+```shell
+>>> queryset = Entry.objects.all()
+>>> [entry for entry in queryset] # Queries the database
+>>> print(queryset[5]) # Uses cache
+>>> print(queryset[5]) # Uses cache
+```
+
 ### Filters
-Filters narrow down the query results based on the given parameters. `filter(**kwargs)` Returns a new QuerySet containing objects that match the given lookup parameters.
+Filters narrow down the query results based on the given parameters. `filter(**kwargs)` Returns a new QuerySet containing 
+objects that match the given lookup parameters. Keyword argument queries – in `filter()`, are `“AND”ed` together
 `exclude(**kwargs)` Returns a new QuerySet containing objects that do not match the given lookup parameters.
 You can chain (refine) multiple filters, Each time you refine a QuerySet, you get a brand-new QuerySet that is in no 
 way bound to the previous QuerySet.
 
 For multivalued relationships, everything inside a single filter is applied simultaneously to filter out items 
 matching all those requirements. Successive filter() calls further restrict the set of objects, but for multi-valued 
-relations, they apply to any object linked to the primary model, not necessarily those objects that were selected by an earlier filter() call.
+relations, they apply to any object linked to the primary model, not necessarily those objects that were 
+selected by an earlier filter() call.
 
+#### Complex lookups with Q objects
+A Q object (django.db.models.Q) is an object used to encapsulate a collection of keyword arguments. Q objects can be
+combined using the `& and | operators`. When an operator is used on two Q objects, it yields a new Q object.
+`Q(question__startswith='Who') | Q(question__startswith='What')` Q objects can be negated using the ~ operator, 
+allowing for combined lookups that combine both a normal query and a negated (NOT) query
+`Q(question__startswith='Who') | ~Q(pub_date__year=2005)`
+ If you provide multiple Q object arguments to a lookup function, the arguments will be “AND”ed together. 
+```shell
+Poll.objects.get(
+    Q(question__startswith='Who'),
+    Q(pub_date=date(2005, 5, 2)) | Q(pub_date=date(2005, 5, 6))
+)
+// translates to 
+SELECT * from polls WHERE question LIKE 'Who%'
+    AND (pub_date = '2005-05-02' OR pub_date = '2005-05-06')
+
+```
+
+Lookup functions can mix the use of Q objects and keyword arguments. All arguments provided to a lookup function 
+(be they keyword arguments or Q objects) are “AND”ed together. However, if a Q object is provided, it must precede 
+the definition of any keyword arguments.
+
+Calling `.delete` on Queryset, method immediately deletes the object and returns the number of objects deleted 
+and a dictionary with the number of deletions per object type. When Django deletes an object, by default it 
+emulates the behavior of the SQL constraint `ON DELETE CASCADE` – in other words, any objects which had foreign keys 
+pointing at the object to be deleted will be deleted along with it.
+
+Note that delete() is the only QuerySet method that is not exposed on a Manager itself. This is a safety mechanism 
+to prevent you from accidentally requesting `Entry.objects.delete()`, and deleting all the entries. If you do want to 
+delete all the objects, then you have to explicitly request a complete query set: `Entry.objects.all().delete()`
+#### New Instances 
+it is possible to easily create new instance with all fields’ values copied. In the simplest case, you can set `pk to 
+None and _state.adding to True`.
+```shell
+blog = Blog(name='My blog', tagline='Blogging is easy')
+blog.save() # blog.pk == 1
+
+blog.pk = None
+blog._state.adding = True
+blog.save() # blog.pk == 2
+```
+#### Updating multiple objects at once
+The only restriction on the QuerySet being updated is that it can only access one database table: the model’s 
+main table.
+```shell
+# Update all the headlines with pub_date in 2007.
+Entry.objects.filter(pub_date__year=2007).update(headline='Everything is the same')
+```
+Be aware that the `update()` method is converted directly to an SQL statement. It is a bulk operation for direct updates. 
+It doesn’t run any `save()` methods on your models, or emit the `pre_save` or `post_save` signals
+When you use `F()` objects in an update – you can only reference fields local to the model being updated
 ### Aggregate
 Following are aggregate operations that can be perfomed on a 
 queryset. aggregate includes `Sum`, `Avg`, `Count`, `Max`, `Min`
@@ -93,3 +173,15 @@ inspect the SQL with `str(queryset.query)` and write plenty of tests
 When Django encounters an instance of F(), it overrides the standard Python operators to create an 
 encapsulated SQL expression, which make it possible to perform operation on DB level instead of pulling object from 
 DB to python memory.
+
+### alias()
+Same as annotate(), but instead of annotating objects in the QuerySet, saves the expression for later reuse with 
+other QuerySet methods. This is useful when the result of the expression itself is not needed but it is used for 
+filtering, ordering, or as a part of a complex expression.
+```shell
+>>> from django.db.models import Count
+>>> blogs = Blog.objects.alias(entries=Count('entry')).filter(entries__gt=5)
+```
+
+alias() allows building complex expressions incrementally, possibly spanning multiple methods and modules, 
+refer to the expression parts by their aliases and only use annotate() for the final result.
