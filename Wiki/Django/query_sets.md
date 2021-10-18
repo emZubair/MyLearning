@@ -151,23 +151,43 @@ Each Author in the result set will have the num_books and highly_rated_books att
 >>> Author.objects.annotate(num_books=Count('book'), highly_rated_books=highly_rated)
 >>> Book.objects.annotate(num_authors=Count('authors')).order_by('num_authors')
 ```
-
-`values()` when values is used with annotate, Instead of returning an annotated result 
-for each result in the original `QuerySet`, the original results are grouped according to the unique 
-combinations of the fields specified in the `values()` clause. If the `values()` clause is applied after the 
-`annotate()` clause, you need to explicitly include the aggregate column in `values()`.
-
 For example in the example below, the authors will be grouped by name, so you will only get an annotated result 
 for each unique author name. This means if you have two authors with the same name, their results will be merged 
 into a single result in the output of the query; the average will be computed as the average over the 
 books written by both authors.
-
 ```shell
 >>> Author.objects.values('name').annotate(average_rating=Avg('book__rating'))
 ```
 
 It’s difficult to intuit how the ORM will translate complex querysets into SQL queries so when in doubt, 
 inspect the SQL with `str(queryset.query)` and write plenty of tests
+
+#### order_by()
+QuerySet are ordered by the ordering tuple given by the ordering option in the model’s Meta. 
+You can override this on a per-QuerySet basis by using the order_by method. To order randomly, use "?",
+`Entry.objects.order_by('?')`, it might be slow though. 
+
+Django will use the default ordering on the related model, or order by the related model’s primary key
+if there is no `Meta.ordering` specified.
+`Entry.objects.order_by(Coalesce('summary', 'headline').desc())`
+
+There’s no way to specify whether ordering should be case sensitive, You can order by a field converted to 
+lowercase with Lower which will achieve case-consistent ordering: `Entry.objects.order_by(Lower('headline').desc())`
+
+If you don’t want any ordering to be applied to a query, not even the default ordering, 
+call `order_by()` with no parameters, You can tell if a query is ordered or not by checking the 
+`QuerySet.ordered` attribute, which will be True if the QuerySet has been ordered in any way.
+
+`asc()` and `desc()` have arguments (nulls_first and nulls_last) that control how null values are sorted.
+
+`values()` when values is used with annotate, Instead of returning an annotated result 
+for each result in the original `QuerySet`, the original results are grouped according to the unique 
+combinations of the fields specified in the `values()` clause. If the `values()` clause is applied after the 
+`annotate()` clause, you need to explicitly include the aggregate column in `values()`.
+
+Each order_by() call will clear any previous ordering. For example, this query will be ordered by 
+pub_date and not headline: `Entry.objects.order_by('headline').order_by('pub_date')`
+
 
 ### F() expressions
 When Django encounters an instance of F(), it overrides the standard Python operators to create an 
