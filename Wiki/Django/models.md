@@ -18,6 +18,20 @@ Subsequent accesses to the foreign key on the same object instance are cached.
 >>> print(e.blog)  # Doesn't hit the database; uses cached version.
 >>> print(e.blog)  # Doesn't hit the database; uses cached version.
 ```
+#### select_related
+Returns a QuerySet that will “follow” `foreign-key` relationships, selecting additional related-object data when it executes its query. 
+This is a performance booster which results in a single more complex query but means later use of foreign-key relationships won’t 
+require database queries.
+
+There may be some situations where you wish to call select_related() with a lot of related objects, or where you don’t know 
+all of the relations. In these cases it is possible to call select_related() with no arguments.
+Chaining select_related calls works in a similar way to other methods - that is that `select_related('foo', 'bar')`
+is equivalent to `select_related('foo').select_related('bar')`. select_related is limited to single-valued relationships - `foreign key` and `one-to-one`.
+
+#### prefetch_related()
+does a separate lookup for each relationship, and does the ‘joining’ in Python. This allows it to prefetch `many-to-many` 
+and `many-to-one` objects, it executed once the main query is executed so each `prefetch_related` results in a separate query.
+
 2. #### Many-to-Many relationships
 To define a many-to-many relationship, use `ManyToManyField`, which requires a positional argument: the 
 class to which the model is related. It’s suggested, but not required, that the name of a ManyToManyField be a 
