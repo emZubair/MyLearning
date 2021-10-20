@@ -96,5 +96,3 @@ result in only the final fields being considered
 #### select_for_update()
 Returns a queryset that will lock rows until the end of the transaction,  rows of related objects specified in `select_related()`
 are locked in addition to rows of the queryset’s model.
-
-### Operators that return new QuerySets
