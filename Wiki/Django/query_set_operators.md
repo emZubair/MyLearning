@@ -51,3 +51,25 @@ The model’s `save()` method will not be called, and the `pre_save` and `post_s
 #### count()
 Returns an integer representing the number of objects in the database matching the QuerySet.
 
+#### in_bulk(id_list=None, *, field_name='pk')
+Takes a list of field values (id_list) and the field_name for those values, and returns a dictionary mapping each value to an 
+instance of the object with the given field value. `field_name` must be a unique field or a distinct field (if there’s only one 
+field specified in `distinct()`). `field_name` defaults to the primary key.
+```shell
+>>> Blog.objects.in_bulk([1])
+{1: <Blog: Beatles Blog>}
+>>> Blog.objects.in_bulk(['beatles_blog'], field_name='slug')
+{'beatles_blog': <Blog: Beatles Blog>}
+```
+If you pass in_bulk() an empty list, you’ll get an empty dictionary. If id_list isn’t provided, all objects in the queryset are returned.
+
+#### latest(*fields), earliest(*fields)
+Returns the latest `(last)` object in the table based on the given field(s). `Entry.objects.latest('pub_date')`, You can also choose the 
+latest based on several fields, while `earliest()` returns the oldest `(first)` result. Both throw exception if no match found.
+
+#### first(), last()
+Returns the first object matched by the queryset, or `None` if there is no matching object, 
+`Article.objects.order_by('title', 'pub_date').first()`, `last()` returns the last or none.
+
+#### exists()
+Returns True if the QuerySet contains any results, and False if not.
