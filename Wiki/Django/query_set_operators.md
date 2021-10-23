@@ -72,4 +72,13 @@ Returns the first object matched by the queryset, or `None` if there is no match
 `Article.objects.order_by('title', 'pub_date').first()`, `last()` returns the last or none.
 
 #### exists()
-Returns True if the QuerySet contains any results, and False if not.
+Returns True if the QuerySet contains any results, and False if not. This tries to perform the query in the simplest and fastest 
+way possible, but it does execute nearly the same query as a normal QuerySet query.
+```shell
+entry = Entry.objects.get(pk=123)
+if some_queryset.filter(pk=entry.pk).exists():
+    print("Entry contained in queryset")
+# Above approach will be faster than 
+if entry in some_queryset:
+   print("Entry contained in QuerySet")    
+```
