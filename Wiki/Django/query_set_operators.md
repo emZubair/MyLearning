@@ -82,3 +82,29 @@ if some_queryset.filter(pk=entry.pk).exists():
 if entry in some_queryset:
    print("Entry contained in QuerySet")    
 ```
+
+#### update(**kwargs)
+Performs an SQL update query for the specified fields, and returns the number of rows matched (which may not be equal to the number 
+of rows updated if some rows already have the new value).
+The update() method is applied instantly, and the only restriction on the QuerySet that is updated is that it can only update columns 
+in the model’s main table, not on related models.
+If you’re just updating a record and don’t need to do anything with the model object, the most efficient approach is to call `update()`, 
+rather than loading the model object into memory.
+```shell
+>>> Entry.objects.filter(pub_date__year=2010).update(comments_on=False, headline='This is old')
+>>> Entry.objects.update(blog__name='foo') # Won't work!
+# Instead of this :point_down:
+e = Entry.objects.get(id=10)
+e.comments_on = False
+e.save() # Do this :point_down: 
+Entry.objects.filter(id=10).update(comments_on=False)
+
+```
+`Note:` Finally, realize that update() does an update at the SQL level and, thus, does not call any `save()` methods on your models, 
+nor does it emit the `pre_save` or `post_save` signals
+
+#### delete()
+Performs an SQL delete query on all rows in the QuerySet and returns the number of objects deleted and a dictionary with the 
+number of deletions per object type.
+The `delete()` method does a bulk delete and does not call any `delete()` methods on your models. It does, however, emit the 
+`pre_delete` and `post_delete` signals for all deleted objects (including cascaded deletions).
