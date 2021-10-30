@@ -1,149 +1,59 @@
 ## Models
 Each model has at least one Manager, and it’s called objects by default.
-## Relationships
-Django provides three most common types of relationships `many-to-one`, `many-to-many` and `one-to-one`.
-1. #### Many-to-one relationships
-To define a many-to-one relationship, use `django.db.models.ForeignKey` which requires a positional argument: the 
-class to which the model is related. Reverse look up uses model name in lower case appended by underscore and set 
-keyword `book_set`
-
-Forward access to one-to-many relationships is cached the first time the related object is accessed. 
-Subsequent accesses to the foreign key on the same object instance are cached.
+By default, Django gives each model an auto-incrementing primary key with the type specified per app in 
+`AppConfig.default_auto_field` or globally in the `DEFAULT_AUTO_FIELD` setting which defaults to `'django.db.models.AutoField'`
 ```shell
->>> e = Entry.objects.get(id=2)
->>> print(e.blog)  # Hits the database to retrieve the associated Blog.
->>> print(e.blog)  # Doesn't hit the database; uses cached version.
-# Note that the select_related() QuerySet method recursively prepopulates the cache of all one-to-many relationships ahead of time.
->>> e = Entry.objects.select_related().get(id=2)
->>> print(e.blog)  # Doesn't hit the database; uses cached version.
->>> print(e.blog)  # Doesn't hit the database; uses cached version.
+from django.apps import AppConfig
+
+class MyappConfig(AppConfig):
+    default_auto_field = 'django.db.models.AutoField'
 ```
-#### select_related
-Returns a QuerySet that will “follow” `foreign-key` relationships, selecting additional related-object data when it executes its query. 
-This is a performance booster which results in a single more complex query but means later use of foreign-key relationships won’t 
-require database queries.
 
-There may be some situations where you wish to call select_related() with a lot of related objects, or where you don’t know 
-all of the relations. In these cases it is possible to call select_related() with no arguments.
-Chaining select_related calls works in a similar way to other methods - that is that `select_related('foo', 'bar')`
-is equivalent to `select_related('foo').select_related('bar')`. select_related is limited to single-valued relationships - `foreign key` and `one-to-one`.
+Table level methods are written in manager class while row level methods are written in model.
+#### Model.refresh_from_db(using=None, fields=None)
+If you need to reload a model’s values from the database, you can use the `refresh_from_db()` method, calling it with no fields updates 
+all the non-deferred values from the database and refills the cache after clearing it.
+#### get_absolute_url()
+This tells Django how to calculate the URL for an object. Django uses this in its admin interface, and any time it needs 
+to figure out a URL for an object.
+#### save(self, *args, **kwargs)
+Can be overridden by a model to change the default change behaviour for an object. If you use `*args`, `**kwargs` in your 
+method definitions, you are guaranteed that your code will automatically support the arguments added in future release of Django.
+### Meta options
+Model metadata is `“anything that’s not a field”`, such as ordering options `(ordering)`, database table name `(db_table)`, 
+or human-readable singular and plural names (verbose_name and verbose_name_plural). Following options can be set using `Meta`
 
-#### prefetch_related()
-does a separate lookup for each relationship, and does the ‘joining’ in Python. This allows it to prefetch `many-to-many` 
-and `many-to-one` objects, it executed once the main query is executed so each `prefetch_related` results in a separate query.
-
-2. #### Many-to-Many relationships
-To define a many-to-many relationship, use `ManyToManyField`, which requires a positional argument: the 
-class to which the model is related. It’s suggested, but not required, that the name of a ManyToManyField be a 
-plural describing the set of related model objects. Generally, ManyToManyField instances should go in the object 
-that’s going to be edited on a form.
-
-When you’re only dealing with many-to-many relationships, sometimes you may need to associate data with the relationship between two models.
-For example, consider the case of an application tracking the musical groups which musicians belong to. 
-There is a many-to-many relationship between a person and the groups of which they are a member, so you could use a 
-ManyToManyField to represent this relationship. However, there is a lot of detail about the membership that you 
-might want to collect, such as the date at which the person joined the group.
-
-For these situations, Django allows you to specify the model that will be used to govern the many-to-many relationship. 
-You can then put extra fields on the intermediate model. The intermediate model is associated with the ManyToManyField 
-using the through argument to point to the model that will act as an intermediary. For our musician example, the code 
-would look something like this:
-```python
+`app_label` If a model is defined outside of an application in INSTALLED_APPS, it must declare which app it belongs to
+`db_table` It is strongly advised that you use lowercase table names when you override the table name
+`default_related_name` The name that will be used by default for the relation from a related object back to this one. 
+The default is `<model_name>_set`.
+`verbose_name` A human-readable name for the object, singular: `verbose_name = "pizza"`
+`verbose_name_plural` The plural name for the object: `verbose_name_plural = "stories"`
+`managed` Django will create the appropriate database tables in migrate or as part of migrations and remove them as part of a 
+flush management command. That is, Django manages the database tables’ lifecycles.
+`default_permissions` Defaults to ('add', 'change', 'delete', 'view'). You may customize this list, for example, 
+by setting this to an empty list if your app doesn’t require any of the default permissions.
+`permissions` Extra permissions to enter into the permissions table when creating this object. Add, change, delete, and view 
+permissions are automatically created for each model. `permissions = [('can_deliver_pizzas', 'Can deliver pizzas')]`
+This is a list or tuple of 2-tuples in the format `(permission_code, human_readable_permission_name)`.
+`indexes` A list of indexes that you want to define on the model:
+`unique_together` Sets of field names that, taken together, must be unique, This is a list of lists that must be unique when 
+considered together: `unique_together = [['driver', 'restaurant']]`
+`constraints` A list of constraints that you want to define on the model:
+```shell
 from django.db import models
 
-class Person(models.Model):
-    name = models.CharField(max_length=128)
+class Customer(models.Model):
+    age = models.IntegerField()
 
-    def __str__(self):
-        return self.name
-
-class Group(models.Model):
-    name = models.CharField(max_length=128)
-    members = models.ManyToManyField(Person, through='Membership')
-
-    def __str__(self):
-        return self.name
-
-class Membership(models.Model):
-    person = models.ForeignKey(Person, on_delete=models.CASCADE)
-    group = models.ForeignKey(Group, on_delete=models.CASCADE)
-    date_joined = models.DateField()
-    invite_reason = models.CharField(max_length=64)
-```
-When you set up the intermediary model, you explicitly specify foreign keys to the models that are involved 
-in the many-to-many relationship.
-
-Both ends of a many-to-many relationship get automatic API access to the other end. The API works similar to a
-“backward” one-to-many relationship, The model that defines the ManyToManyField uses the attribute name of that 
-field itself, whereas the “reverse” model uses the lowercased model name of the original model, plus '_set' 
-3. ### One-to-one relationships
-`OneToOneField` is used to define this, This is most useful on the primary key of an object when that object 
-“extends” another object in some way.  If you define a OneToOneField on your model, instances of that model 
-will have access to the related object via an attribute of the model and reverse model can access via lower cased model name.
-
-`Note` If you need to create a relationship on a model that has not yet been defined, you can use the name of 
-the model, rather than the model object itself. i.e `manufacturer = models.ForeignKey('Manufacturer', on_delete=models.CASCADE)`
-#### Field Name Restrictions
-A field name cannot contain more than one underscore in a row, due to the way Django’s query lookup syntax works and it can't
-end with an underscore for same reason.
-`get_absolute_url()` tells Django how to calculate the URL for an object.
-## Tables
-`Verbose name` is an option first positional parameter for all field except relational ones, for those you need to provide 
-it using `verbose_name` keyword argument.
-
-`blank and null`: `null` is purely `database-related`, whereas `blank` is `validation-related`. If a field has 
-blank=True, form validation will allow entry of an empty value.
-
-#### Table Names
-Table names are automatically derived from Django app that you created, followed by underscore and model name.
-To override the database table name, use the `db_table` parameter in `class Meta`.
-
-```markdown
-For example, if you have an app bookstore (as created by manage.py startapp bookstore), a model defined as class 
-Book will have a database table named bookstore_book. This model will then not be used to create any database table. 
-```
-
-## Model inheritance
-1. ### Abstract base classes
-Abstract base classes are useful when you want to put some common information into a number of other models. You write 
-your base class and put abstract=True in the Meta class
-2. ### Multi-table inheritance
-he second type of model inheritance supported by Django is when each model in the hierarchy is a model all by itself.
-The inheritance relationship introduces links between the child model and each of its parents (via an automatically-
-created OneToOneField).
-3. ### Proxy models
-You can create, delete and update instances of the proxy model and all the data will be saved as if you were using the 
-original (non-proxied) model. The difference is that you can change things like the default model ordering or the 
-default manager in the proxy, without having to alter the original.
-
-Proxy models are declared like normal models. You tell Django that it’s a proxy model by setting the proxy attribute of 
-the Meta class to True.
-```python
-from django.db import models
-
-class Person(models.Model):
-    first_name = models.CharField(max_length=30)
-    last_name = models.CharField(max_length=30)
-
-class MyPerson(Person):
     class Meta:
-        proxy = True
-
-    def do_something(self):
-        # ...
-        pass
+        constraints = [
+            models.CheckConstraint(check=models.Q(age__gte=18), name='age_gte_18'),
+        ]
 ```
-The MyPerson class operates on the same database table as its parent Person class. In particular, any new instances of Person will also be 
-accessible through MyPerson
-```shell
->>> p = Person.objects.create(first_name="foobar")
->>> MyPerson.objects.get(first_name="foobar")
-<MyPerson: foobar>
-```
-A proxy model must inherit from exactly one non-abstract model class, A proxy model can inherit from any 
-number of abstract model classes, providing they do not define any model fields. A proxy model may also 
-inherit from any number of proxy models that share a common non-abstract parent class.
-4. ### Multiple inheritance
-it’s possible for a Django model to inherit from multiple parent models.
 
-A derived class can remove field define in base class setting it None, i.e `field_name = None` 
+
+
+
+
+

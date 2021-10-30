@@ -108,3 +108,12 @@ Performs an SQL delete query on all rows in the QuerySet and returns the number 
 number of deletions per object type.
 The `delete()` method does a bulk delete and does not call any `delete()` methods on your models. It does, however, emit the 
 `pre_delete` and `post_delete` signals for all deleted objects (including cascaded deletions).
+
+#### explain(format=None, **options)
+Returns a string of the QuerySet’s execution plan, which details how the database would execute the query, including any indexes 
+or joins that would be used. Knowing these details may help you improve the performance of slow queries.
+```shell
+>>> print(Blog.objects.filter(title='My Blog').explain())
+Seq Scan on blog  (cost=0.00..35.50 rows=10 width=12)
+  Filter: (title = 'My Blog'::bpchar)
+```
