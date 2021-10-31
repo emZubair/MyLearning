@@ -9,6 +9,7 @@ be careful when ordering by fields not in the values() call.
 Returns a QuerySet that returns dictionaries, rather than model instances, when used as an iterable, each of those dictionaries 
 represents an object, with the keys corresponding to the attribute names of model objects. The `values()` method takes optional 
 positional arguments, `*fields`, which specify field names to which the SELECT should be limited.
+
 ```shell
 # This list contains a Blog object.
 >>> Blog.objects.filter(name__startswith='Beatles')
