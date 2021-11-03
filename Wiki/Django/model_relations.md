@@ -104,15 +104,16 @@ Book will have a database table named bookstore_book. This model will then not b
 ## Model inheritance
 1. ### Abstract base classes
 Abstract base classes are useful when you want to put some common information into a number of other models. You write 
-your base class and put abstract=True in the Meta class
+your base class and put `abstract=True` in the Meta class. Base class fields can be `overridden` by 
+derived classes or can be removed by using `None`.
 2. ### Multi-table inheritance
-he second type of model inheritance supported by Django is when each model in the hierarchy is a model all by itself.
+Second type of model inheritance supported by Django is when each model in the hierarchy is a model all by itself.
 The inheritance relationship introduces links between the child model and each of its parents (via an automatically-
 created OneToOneField).
 3. ### Proxy models
-You can create, delete and update instances of the proxy model and all the data will be saved as if you were using the 
-original (non-proxied) model. The difference is that you can change things like the default model ordering or the 
-default manager in the proxy, without having to alter the original.
+Sometimes, you only want to change the Python behavior of a model, you can create, delete and update instances of the 
+proxy model and all the data will be saved as if you were using the original (non-proxied) model. The difference is that you 
+can change things like the default model ordering or the default manager in the proxy, without having to alter the original.
 
 Proxy models are declared like normal models. You tell Django that it’s a proxy model by setting the proxy attribute of 
 the Meta class to True.
@@ -141,6 +142,9 @@ accessible through MyPerson
 A proxy model must inherit from exactly one non-abstract model class, A proxy model can inherit from any 
 number of abstract model classes, providing they do not define any model fields. A proxy model may also 
 inherit from any number of proxy models that share a common non-abstract parent class.
+Inherited class also inherits Meta from base class, can also define its own metaclass which will inherit from base class Meta class.
+If a child class inherits from multiple abstract base classes, only the Meta options from the first listed class will be 
+inherited by default.
 4. ### Multiple inheritance
 it’s possible for a Django model to inherit from multiple parent models.
 
