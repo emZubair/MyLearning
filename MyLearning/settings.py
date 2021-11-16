@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'prac_models.apps.PracModelsConfig'
 ]
 
 MIDDLEWARE = [

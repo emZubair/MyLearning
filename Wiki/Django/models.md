@@ -52,8 +52,18 @@ class Customer(models.Model):
         ]
 ```
 
+#### Asserting Number of Queries
+We can count number of queries for testing by using `assertNumQueries()` method.
+```shell
+def test_number_of_queries(self):
+    User.objects.create(username='testuser1', first_name='Test', last_name='user1')
+    # Above ORM create will run only one query.
+    self.assertNumQueries(1)
+    User.objects.filter(username='testuser').update(username='test1user')
+    # One more query added.
+    self.assertNumQueries(2)
+```
 
-
-
-
-
+When we execute the command python manage.py test, a new db is created everytime. This doesn’t matter much if we don’t 
+have many migrations. But when we have many migrations, it takes a long time to recreate the database between the test runs.
+You can prevent the test databases from being destroyed by adding the --keepdb flag to the test command. `python manage.py test --keepdb`

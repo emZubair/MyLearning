@@ -121,6 +121,9 @@ queryset. aggregate includes `Sum`, `Avg`, `Count`, `Max`, `Min`
 #### Annotate
 Per-object summaries can be generated using the `annotate()` clause. When an `annotate()` clause is 
 specified, each object in the QuerySet will be annotated with the specified values.
+The alias for the annotation can be used in `filter()` and `exclude()` clauses in the same way as any other model field.
+
+
 
 ```shell
 # Build an annotated queryset
@@ -192,7 +195,8 @@ pub_date and not headline: `Entry.objects.order_by('headline').order_by('pub_dat
 ### F() expressions
 When Django encounters an instance of F(), it overrides the standard Python operators to create an 
 encapsulated SQL expression, which make it possible to perform operation on DB level instead of pulling object from 
-DB to python memory.
+DB to python memory. These references can then be used in query filters to compare the values of two different 
+fields on the same model instance.
 
 ### alias()
 Same as annotate(), but instead of annotating objects in the QuerySet, saves the expression for later reuse with 
