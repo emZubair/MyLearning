@@ -28,3 +28,12 @@ class CategoryAdmin(admin.ModelAdmin):
 
     inlines = [VillainInline]
 ```
+You can make fields readonly only once an object is created
+```shell
+def get_readonly_fields(self, request, obj=None):
+    if obj:
+        return ["name", "category"]
+    else:
+        return []
+```
+`formfield_for_foreignkey` is used to customize foreign key values, `raw_id_fields` is used to show a popup to edit FK objects.
