@@ -1,0 +1,19 @@
+{% extends "blog/base.html" %}
+
+{% block title %} ZeeBlog {% endblock title %}
+
+{% block content %}
+    <h1 class="blog-header">Published Posts</h1>
+    <div class="blog-container">
+        {% for post in posts %}
+            <h2>
+                <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+            </h2>
+            <p class="date">
+                Published {{post.published}} by {{ post.author }}
+            </p>
+            {{ post.body|truncatewords:30|linebreaks}}
+        {% endfor %}
+    </div>
+    {% include "pagination.html" with page=posts %}
+{% endblock content %}

@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+import blog.blog_app.apps
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -30,16 +32,19 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
+CUSTOM_APPS = [
+    'prac_models.apps.PracModelsConfig',
+    'blog.blog_app.apps.BlogAppConfig',
+]
+
 INSTALLED_APPS = [
     'django.contrib.admin',
-    'django.contrib.auth',
+    R'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
-    'prac_models.apps.PracModelsConfig'
-]
+] + CUSTOM_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
