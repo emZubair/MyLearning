@@ -1,0 +1,24 @@
+{% extends "blog/base.html" %}
+
+{% block title %} Share a Post {% endblock %}
+
+{% block content %}
+<div class="email-template">
+    {% if sent %}
+        <div class="email-sent">
+            <p>
+                {{ post.title }} was successfully sent via Email to:{{ form.receiver_email}}
+            </p>
+        </div>
+    {% else %}
+        <div class="email-form">
+            <h1> Share "{{post.title}}" by e-mail?</h1>
+            <form method="post" novalidate>
+                {{form.as_p}}
+                {% csrf_token %}
+                <input type="submit" value="send E-mail">
+            </form>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
