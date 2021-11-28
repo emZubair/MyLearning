@@ -1,6 +1,9 @@
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import ListView
+from django.db.models import Count
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+
+from taggit.models import Tag
 
 from .models import Post
 from .helpers import send_email
@@ -14,8 +17,12 @@ class PostListView(ListView):
     template_name = 'blog/post/list.html'
 
 
-def post_list(request, *args, **kwargs):  # pylint-ignore=unused-variables
+def post_list(request, tag_slug=None, *args, **kwargs):  # pylint-ignore=unused-variables
     posts = Post.publisher.all()
+    if tag_slug:
+        tag = get_object_or_404(Tag, slug=tag_slug)
+        posts = posts.filter(tags__in=[tag])
+
     paginator = Paginator(posts, 3)
     page_number = request.GET.get('page')
     try:
@@ -24,13 +31,17 @@ def post_list(request, *args, **kwargs):  # pylint-ignore=unused-variables
         posts = paginator.page(1)
     except EmptyPage:   # If page is out of range, Display the last page
         posts = paginator.page(paginator.num_pages)
-    return render(request, 'blog/post/list.html', {'posts': posts, 'page': page_number})
+    return render(request, 'blog/post/list.html', {'posts': posts, 'page': page_number,
+                                                   'tag_slug': tag_slug})
 
 
 def post_details(request, year, month, day, post):
     post = get_object_or_404(Post, slug=post, status='published', published__year=year,
                              published__month=month, published__day=day)
 
+    post_tags_ids = post.tags.values_list('id', flat=True)
+    related_posts = Post.objects.filter(tags__in=post_tags_ids, status='published').exclude(id=post.id)
+    related_posts = related_posts.annotate(same_tags=Count('tags')).order_by('same_tags', '-published')[:4]
     comments = post.comments.filter(active=True)
     new_comment = None
     if request.method == 'POST':
@@ -41,10 +52,12 @@ def post_details(request, year, month, day, post):
             new_comment.save()
     else:
         comment_form = CommentForm()
+
     return render(request, 'blog/post/detail.html', {'post': post,
                                                      'comments': comments,
                                                      'new_comment': new_comment,
-                                                     'comment_form': comment_form})
+                                                     'comment_form': comment_form,
+                                                     'related_posts': related_posts})
 
 
 def default_pager(request, msg):
