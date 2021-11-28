@@ -9,12 +9,9 @@ https://docs.djangoproject.com/en/2.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.2/ref/settings/
 """
-
+# pylint: disable-all
 import os
-from django.core.exceptions import ObjectDoesNotExist
-
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-import blog.blog_app.apps
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -34,6 +31,10 @@ CUSTOM_APPS = [
     'blog.blog_app.apps.BlogAppConfig',
 ]
 
+REQUIRED_APPS = [
+    'taggit'
+]
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     R'django.contrib.auth',
@@ -41,7 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-] + CUSTOM_APPS
+] + CUSTOM_APPS + REQUIRED_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -128,6 +129,6 @@ EMAIL_USE_TLS = True
 
 STATIC_URL = '/static/'
 try:
-    from .local_settings import *
-except:
+    from .local_settings import *  # pylint: disable=wildcard-import
+except:  # pylint: disable=bare-except
     pass
