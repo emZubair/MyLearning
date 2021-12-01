@@ -1,5 +1,5 @@
 {% extends "blog/base.html" %}
-
+{% load blog_tag %}
 {% block title %} {{post.title}}'s Details {% endblock %}
 
 {% block content %}
@@ -34,7 +34,7 @@
             <p class="info">
                 Comment {{forloop.counter}} by {{comment.name}} {{ comment.created }}
             </p>
-            {{comment.body|linebreaks}}
+            {{comment.body|markdown}}
         </div>
     {% empty %}
         <p>There are no comments yet.</p>
