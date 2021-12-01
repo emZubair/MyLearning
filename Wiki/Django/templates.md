@@ -10,3 +10,5 @@ def total_posts():
 The above code will register tag as simple tag and `total_posts` will be the name of the tag, if you want to change the name pass it 
 in simple_tag decorator, i.e `@register.simple_tag(name="my_tag")`. Custom tags should be loaded using `{% load file_name_of_tags %}`.
 Inclusion tags have to return a dictionary of values, which is used as the context to render the specified template.
+`filters` are also registered the same way as tags, i.e `@register.filter(name='name_the_filter')`
+`Note:` filters and tags should be imported in derived pages as well, importing only in base page will not work.

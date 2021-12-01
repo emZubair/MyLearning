@@ -24,6 +24,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+SITE_ID = 1
+
 # Application definition
 
 CUSTOM_APPS = [
@@ -40,8 +42,11 @@ INSTALLED_APPS = [
     R'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
+    'django.contrib.sites',
+    'django.contrib.sitemaps',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.postgres'
 ] + CUSTOM_APPS + REQUIRED_APPS
 
 MIDDLEWARE = [
