@@ -38,8 +38,9 @@ REQUIRED_APPS = [
 ]
 
 INSTALLED_APPS = [
+    'bookmarks.account.apps.AccountConfig',  # Placing it at the top so that it is used before Django's
     'django.contrib.admin',
-    R'django.contrib.auth',
+    'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
@@ -123,6 +124,9 @@ USE_L10N = True
 
 USE_TZ = True
 
+LOGIN_URL = 'bookmarks:account:login'
+LOGOUT_URL = 'bookmarks:account:logout'
+LOGIN_REDIRECT_URL = 'bookmarks:account:dashboard'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
@@ -130,7 +134,9 @@ USE_TZ = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
 
 STATIC_URL = '/static/'
 try:
