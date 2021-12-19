@@ -4,7 +4,8 @@
 
 {% block content %}
 <h1>Log-in</h1>
-<p>Please use the following form to Login</p>
+<p>Please use the following form to Login. if you don't have an account, <a href="{% url 'bookmarks:account:register'%}">Register</a>
+to create a new account.</p>
 <form method="post" novalidate>
     {% csrf_token %}
     {{ form.as_p }}

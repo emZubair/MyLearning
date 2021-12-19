@@ -17,6 +17,8 @@ from django.contrib import admin
 from django.urls import path, include
 from prac_models.admin import event_admin_site
 from django.contrib.sitemaps.views import sitemap
+from django.conf import settings
+from django.conf.urls.static import static
 
 from blog.blog_app.sitemaps import PostSiteMap
 
@@ -31,3 +33,6 @@ urlpatterns = [
     path('bookmarks/', include('bookmarks.urls', namespace='bookmarks')),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.view.sitemap')
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

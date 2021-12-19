@@ -18,7 +18,10 @@
                 <a href="#">Images</a>
             </li>
             <li {% if section == 'people'%} class="selected" {% endif %}>
-                <a href="$">People</a>
+                <a href="#">People</a>
+            </li>
+            <li {% if section == 'profile'%} class="selected" {% endif %}>
+                <a href="{% url 'bookmarks:account:edit_profile' %}">Profile</a>
             </li>
         </ul>
     {% endif %}
@@ -32,6 +35,16 @@
 </div>
 
 <div id="content">
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li class="{{ message.tags }}">
+                    {{message|safe}}
+                    <a href="#" class="close">x</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
     {% block content %}
     {% endblock content%}
 </div>
