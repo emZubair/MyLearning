@@ -4,11 +4,26 @@
 
 {% block content %}
 <h1>Dashboard</h1>
-<p>Welcome to Dashboard page</p>
+<p>Welcome to Dashboard page, you can edit your <a href="{% url 'bookmarks:account:edit_profile' %}">Profile</a>
+    or <a href="{% url 'bookmarks:account:password_change' %}">Change your password</a></p>
 
 <form method="post" novalidate>
     {{ form.as_p }}
     {% csrf_token %}
+    <input type="checkbox" value="Monday">
     <input type="submit" value="Send Email">
+    <input type="button" value="ValueButton">
+    <input type="color" class="colors">
+    <input type="date">
+    <input type="datetime-local">
+    <input type="week">
+    <input type="file">
+    <input type="month">
+    <input type="password">
+    <input type="time">
+    <input type="range">
+    <input type="tel">
+    <input type="image">
+    <input type="radio">
 </form>
 {% endblock %}
