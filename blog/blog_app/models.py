@@ -24,6 +24,7 @@ class Post(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='blog_posts')
     published = models.DateField(default=timezone.now)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='draft')
+    likes = models.PositiveIntegerField(default=0)
 
     tags = TaggableManager()
     objects = models.Manager()
@@ -34,6 +35,13 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+
+    def increment_likes(self):
+        self.likes += 1
+
+    def decrement_likes(self):
+        if self.likes > 0:
+            self.likes -= 1
 
     def get_absolute_url(self):
         return reverse('blog:posts:post_details', args=[

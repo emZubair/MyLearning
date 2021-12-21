@@ -12,6 +12,12 @@
     <p>
         <a href="{% url 'blog:posts:share_post' post.id %}">Share</a>
     </p>
+    <div class="likes">
+        <span>Total Likes: <p class="likes-count">{{post.likes}}</p></span>
+        <a href="#" data-id="{{post.id}}" data-action="like" class="like-button">Like Post</a>
+        <a href="#" data-id="{{post.id}}" data-action="unlike" class="unlike-button">UnLike Post</a>
+        <button class="btn-like">Like Post</button>
+    </div>
     <div class="recommendation">
         {% if related_posts %}
             <h2>Similar Posts</h2>
@@ -50,6 +56,36 @@
                 <p><input type="submit" value="Add Comment"></p>
             </form>
         {% endif %}
+    </div>
+    <div class="js-action-block">
+        {% block domready %}
+            $("a.like-button").click(function(e){
+                console.log("Clicked Like")
+                e.preventDefault();
+                $.post("{% url 'blog:posts:like_post' %}", {
+                    id: this.dataset.id,
+                    action: 'like'
+                }, function(data){
+                    console.log("Response returned ", data)
+                    if (data['status'] === 'Ok') {
+                        $(".likes-count").text(data['count'])
+                    }
+                });
+            });
+            $("a.unlike-button").click(function(e){
+                e.preventDefault();
+                console.log("removing count")
+                $.post('{% url "blog:posts:like_post" %}', {
+                    id: this.dataset.id,
+                    action: 'unlike'
+                }, function(data){
+                    if (data['status'] == 'Ok') {
+                        $(".likes-count").text(data['count'])
+                    }
+                }
+              );
+            });
+        {% endblock %}
     </div>
 </div>
 {% endblock %}
