@@ -36,7 +36,8 @@ CUSTOM_APPS = [
 ]
 
 REQUIRED_APPS = [
-    'taggit'
+    'taggit',
+    'django_extensions'
 ]
 
 INSTALLED_APPS = [

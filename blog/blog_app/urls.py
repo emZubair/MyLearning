@@ -2,7 +2,7 @@ from django.urls import path
 from django.contrib.sitemaps.views import sitemap
 
 from .views import (post_list, post_details, default_pager, PostListView, share_post,
-                    post_search)
+                    post_search, like_post)
 from .sitemaps import PostSiteMap
 from .feeds import LatestPostFeed
 
@@ -17,6 +17,7 @@ sitemaps = {
 urlpatterns = [
     path('', PostListView.as_view(), name='post_list'),
     path('feed/', LatestPostFeed(), name='post_feed'),
+    path('like/', like_post, name='like_post'),
     path('search/', post_search, name='total_posts'),
     path('<msg>/default', default_pager, name='defaulter'),
     path('<int:post_id>/share', share_post, name='share_post'),

@@ -7,7 +7,7 @@ from .models import Image
 
 
 def get_extension_from_url(url):
-    return url.split('.', 1)[1].lower()
+    return url.rsplit('.', 1)[1].lower()
 
 
 class ImageForm(forms.ModelForm):
@@ -23,7 +23,7 @@ class ImageForm(forms.ModelForm):
         valid_extension = 'jpg jpeg png'
         extension = get_extension_from_url(url)
         if extension not in valid_extension:
-            raise forms.ValidationError(f"Image URL doesn't contain valid extension:{valid_extension}")
+            raise forms.ValidationError(f"Image URL doesn't contain valid extension: {valid_extension}")
         return url
 
     def save(self, commit=True):

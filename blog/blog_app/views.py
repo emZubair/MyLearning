@@ -1,6 +1,9 @@
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import ListView
 from django.db.models import Count
+from django.http import JsonResponse, HttpResponse
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 from django.contrib.postgres.search import SearchVector, SearchRank, SearchQuery, TrigramSimilarity
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
@@ -8,6 +11,7 @@ from taggit.models import Tag
 
 from .models import Post
 from .helpers import send_email
+from common.decorators import ajax_required
 from .forms import (EmailPostForm, CommentForm, SearchForm)
 
 
@@ -31,7 +35,13 @@ def post_list(request, tag_slug=None, *args, **kwargs):  # pylint-ignore=unused-
     except PageNotAnInteger:    # DEFAULT TO First Page when no page number is specified
         posts = paginator.page(1)
     except EmptyPage:   # If page is out of range, Display the last page
+        if request.is_ajax():
+            return HttpResponse('')
         posts = paginator.page(paginator.num_pages)
+    if request.is_ajax():
+        return render(request, 'blog/post.ajax_list', {
+            'posts': posts
+        })
     return render(request, 'blog/post/list.html', {'posts': posts, 'page': page_number,
                                                    'tag_slug': tag_slug})
 
@@ -108,3 +118,21 @@ def post_search(request):
     return render(request, 'blog/post/search.html', {
         'form': form, 'query': query, 'results': results
     })
+
+
+@login_required
+@require_POST
+@ajax_required
+def like_post(request):
+    post_id = request.POST.get('id')
+    action = request.POST.get('action')
+
+    if post_id and action:
+        try:
+            post = Post.objects.get(id=post_id)
+            post.increment_likes() if action == 'like' else post.decrement_likes()
+            post.save()
+            return JsonResponse({'status': 'Ok', 'count': post.likes})
+        except Post.DoesNotExist:
+            pass
+    return JsonResponse({'status': 'error'})

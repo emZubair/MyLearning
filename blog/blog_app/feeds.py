@@ -4,6 +4,7 @@ from django.template.defaultfilters import truncatewords
 
 from .models import Post
 
+
 class LatestPostFeed(Feed):
     title = 'ZeeBlog'
     link = reverse_lazy('blog:posts:post_list')
