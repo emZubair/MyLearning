@@ -7,6 +7,13 @@
 <p>Welcome to Dashboard page, you can edit your <a href="{% url 'bookmarks:account:edit_profile' %}">Profile</a>
     or <a href="{% url 'bookmarks:account:password_change' %}">Change your password</a></p>
 
+<h1>What's happening</h1>
+<div id="action-list">
+    {% for action in actions %}
+        {% include 'actions/details.html' with actions=actions%}
+    {% endfor %}
+</div>
+
 <form method="post" novalidate>
     {{ form.as_p }}
     {% csrf_token %}
