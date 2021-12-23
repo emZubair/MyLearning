@@ -11,7 +11,9 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 # pylint: disable-all
 import os
+from django.urls import reverse_lazy
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+import blog.actions.apps
 import bookmarks.images.apps
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -33,11 +35,13 @@ CUSTOM_APPS = [
     'prac_models.apps.PracModelsConfig',
     'blog.blog_app.apps.BlogAppConfig',
     'bookmarks.images.apps.ImagesConfig',
+    'blog.actions.apps.ActionsConfig',
 ]
 
 REQUIRED_APPS = [
     'taggit',
-    'django_extensions'
+    'django_extensions',
+    'easy_thumbnails'
 ]
 
 INSTALLED_APPS = [
@@ -136,6 +140,10 @@ LOGIN_URL = 'bookmarks:account:login'
 LOGOUT_URL = 'bookmarks:account:logout'
 LOGIN_REDIRECT_URL = 'bookmarks:account:dashboard'
 
+ABSOLUTE_URL_OVERRIDES = {
+    'auth.user': lambda u: reverse_lazy('blog:posts:user_details', args=[u.username])
+}
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
@@ -149,6 +157,10 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+
+REDIS_HOST = 'localhost'
+REDIS_PORT = 6379
+REDIS_DB = 0
 
 try:
     from .local_settings import *  # pylint: disable=wildcard-import

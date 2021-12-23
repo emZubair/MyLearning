@@ -11,5 +11,8 @@ to create a new account.</p>
     {{ form.as_p }}
     <input type="submit" value="Login">
 </form>
+{%if error%}
+{{error}}
+{% endif%}
 <a href="{% url 'bookmarks:account:password_reset'%}">Forgot Password?</a>
 {% endblock %}

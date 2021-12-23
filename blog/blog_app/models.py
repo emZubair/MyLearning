@@ -2,6 +2,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 
 from taggit.managers import TaggableManager
 
@@ -67,3 +68,22 @@ class Comment(models.Model):
 
     def __str__(self):
         return f'A comment by {self.name} on {self.post}'
+
+
+class Contact(models.Model):
+    to_user = models.ForeignKey('auth.User', related_name='to_user', on_delete=models.CASCADE)
+    from_user = models.ForeignKey('auth.User', related_name='from_user', on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        ordering = ('-created', )
+
+    def __str__(self):
+        return f'{self.from_user} follows {self.user_to}'
+
+
+# Add the following field to the User model Dynamically
+user_model = get_user_model()
+user_model.add_to_class('following', models.ManyToManyField(
+    'self', through=Contact, related_name='followers', symmetrical=False
+))
