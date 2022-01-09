@@ -15,22 +15,24 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from prac_models.admin import event_admin_site
 from django.contrib.sitemaps.views import sitemap
 from django.conf import settings
 from django.conf.urls.static import static
 
+from prac_models.admin import event_admin_site
 from blog.blog_app.sitemaps import PostSiteMap
 
 sitemaps = {
     'posts': PostSiteMap
 }
 
+# path('bookmarks/', include('bookmarks.urls', namespace='bookmarks')),
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('admin2/', event_admin_site.urls),
     path('blog/', include('blog.urls', namespace='blog')),
-    path('bookmarks/', include('bookmarks.urls', namespace='bookmarks')),
+
+    path('edx/', include('edx.urls', namespace='edx')),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.view.sitemap')
 ]
 

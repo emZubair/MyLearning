@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign In{% endblock %}
+
+{% block content %}
+<h1>Sign in</h1>
+<div class="module">
+    {% if form.errors %}
+        <p>Your username or password didn't match, try again</p>
+    {% else %}
+        <p>User the following form to login</p>
+        <div class="login-form">
+            <form action="{% url 'edx:courses:login' %}" method="post">
+                {% csrf_token %}
+                {{form.as_p}}
+                <input type="hidden" value="{{next}}" name="next">
+                <p><input type="submit" value="Sign in"></p>
+            </form>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
