@@ -15,6 +15,7 @@ from django.urls import reverse_lazy
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import blog.actions.apps
 import bookmarks.images.apps
+import edx.courses.apps
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -36,6 +37,7 @@ CUSTOM_APPS = [
     'blog.blog_app.apps.BlogAppConfig',
     'bookmarks.images.apps.ImagesConfig',
     'blog.actions.apps.ActionsConfig',
+    'edx.courses.apps.CoursesConfig',
 ]
 
 REQUIRED_APPS = [
@@ -45,7 +47,7 @@ REQUIRED_APPS = [
 ]
 
 INSTALLED_APPS = [
-    'bookmarks.account.apps.AccountConfig',  # Placing it at the top so that it is used before Django's
+    # 'bookmarks.account.apps.AccountConfig',  # Placing it at the top so that it is used before Django's
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -136,9 +138,9 @@ USE_L10N = True
 
 USE_TZ = True
 
-LOGIN_URL = 'bookmarks:account:login'
-LOGOUT_URL = 'bookmarks:account:logout'
-LOGIN_REDIRECT_URL = 'bookmarks:account:dashboard'
+LOGIN_URL = 'edx:courses:login'
+LOGOUT_URL = 'edx:courses:logout'
+LOGIN_REDIRECT_URL = 'edx:courses:manage_course_list'
 
 ABSOLUTE_URL_OVERRIDES = {
     'auth.user': lambda u: reverse_lazy('blog:posts:user_details', args=[u.username])

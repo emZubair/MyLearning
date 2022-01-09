@@ -1,0 +1,31 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}edX {% endblock %}</title>
+    <link href="{% static 'css/base.css' %}" rel="stylesheet">
+</head>
+<body>
+<div id="header">
+    <a href="{% url 'edx:courses:manage_course_list' %}" class="logo">edX</a>
+    <ul class="menu">
+        {% if request.user.is_authenticated %}
+        <li><a href="{% url 'edx:courses:logout' %}">Sign out</a></li>
+        {% else %}
+        <li><a href="{% url 'edx:courses:login' %}">Sign in</a></li>
+        {% endif %}
+    </ul>
+</div>
+<div id="content">
+    {% block content %}{% endblock %}
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function(){
+        {% block jsready %}
+        {% endblock %}
+    });
+</script>
+</body>
+</html>
