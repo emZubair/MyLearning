@@ -2,7 +2,8 @@ from django.urls import path
 from django.contrib.auth.views import LoginView, LogoutView
 
 from .views import (CourseCreateView, CourseUpdateView, CourseDeleteView, ManageCourseListView,
-                    CourseModuleUpdateView, ContentCreateUpdateView, ContentDeleteView, ModuleContentListView)
+                    CourseModuleUpdateView, ContentCreateUpdateView, ContentDeleteView, ModuleContentListView,
+                    ModuleOrderView, ContentOrderView, CourseListView, CourseDetailsView)
 
 app_name = 'courses'
 
@@ -21,4 +22,9 @@ urlpatterns = [
          name='module_content_update'),
     path('content/<int:id>/delete/', ContentDeleteView.as_view(), name='module_content_delete'),
     path('module/<int:module_id>/', ModuleContentListView.as_view(), name='module_content_list'),
+    path('module/order/', ModuleOrderView.as_view(), name='module_order'),
+    path('content/order/', ContentOrderView.as_view(), name='content_order'),
+
+    path('subjects/<slug:subject>/', CourseListView.as_view(), name='course_list_subject'),
+    path('<slug:slug>/', CourseDetailsView.as_view(), name='course_details'),
 ]

@@ -38,6 +38,7 @@ CUSTOM_APPS = [
     'bookmarks.images.apps.ImagesConfig',
     'blog.actions.apps.ActionsConfig',
     'edx.courses.apps.CoursesConfig',
+    'edx.student.apps.StudentConfig',
 ]
 
 REQUIRED_APPS = [

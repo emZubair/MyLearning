@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{%if subject%} {{subject.title}} courses {%else%}All Courses {% endif %}
+{%endblock%}
+
+{% block content %}
+<h1>
+    {% if subject %}
+        {{subject.title}} courses
+    {% else %}
+        All Courses
+    {% endif %}
+</h1>
+<div class="contents">
+    <h3>Subjects</h3>
+    <ul id="modules">
+        <li {%if not subject%} class="selected" {%endif%}>
+            <a href="{% url 'course_list' %}">All</a></li>
+        {% for subj in subjects %}
+            <li {% if subj == subject %} class="selected" {% endif %}>
+                <a href="{% url 'edx:courses:course_list_subject' subj.slug %}">{{subj.title}}
+                <br><span>{{subj.total_courses}} courses</span>
+                </a></li>
+        {%endfor %}
+
+    </ul>
+</div>
+<div class="module">
+    {% for course in courses %}
+        {% with subject=course.subject %}
+            <h3>
+                <a href="{% url 'edx:courses:course_details' course.slug %}">{{course.title}}</a>
+            </h3>
+            <p>
+                <a href="{% url 'edx:courses:course_list_subject' subject.slug %}">
+                    {{subject}}
+                </a>.
+                {{course.total_modules}} modules.
+                Instructor {{course.author.get_full_name}}
+            </p>
+        {% endwith %}
+    {% endfor %}
+</div>
+{% endblock %}
