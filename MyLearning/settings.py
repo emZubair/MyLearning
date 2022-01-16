@@ -13,9 +13,6 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 import os
 from django.urls import reverse_lazy
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-import blog.actions.apps
-import bookmarks.images.apps
-import edx.courses.apps
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -38,12 +35,14 @@ CUSTOM_APPS = [
     'bookmarks.images.apps.ImagesConfig',
     'blog.actions.apps.ActionsConfig',
     'edx.courses.apps.CoursesConfig',
+    'edx.student.apps.StudentConfig',
 ]
 
 REQUIRED_APPS = [
     'taggit',
+    'embed_video',
     'django_extensions',
-    'easy_thumbnails'
+    'easy_thumbnails',
 ]
 
 INSTALLED_APPS = [
@@ -140,7 +139,7 @@ USE_TZ = True
 
 LOGIN_URL = 'edx:courses:login'
 LOGOUT_URL = 'edx:courses:logout'
-LOGIN_REDIRECT_URL = 'edx:courses:manage_course_list'
+LOGIN_REDIRECT_URL = reverse_lazy('edx:student:student_course_list')
 
 ABSOLUTE_URL_OVERRIDES = {
     'auth.user': lambda u: reverse_lazy('blog:posts:user_details', args=[u.username])

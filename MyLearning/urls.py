@@ -21,6 +21,7 @@ from django.conf.urls.static import static
 
 from prac_models.admin import event_admin_site
 from blog.blog_app.sitemaps import PostSiteMap
+from edx.courses.views import CourseListView
 
 sitemaps = {
     'posts': PostSiteMap
@@ -28,6 +29,7 @@ sitemaps = {
 
 # path('bookmarks/', include('bookmarks.urls', namespace='bookmarks')),
 urlpatterns = [
+    path('', CourseListView.as_view(), name='course_list'),
     path('admin/', admin.site.urls),
     path('admin2/', event_admin_site.urls),
     path('blog/', include('blog.urls', namespace='blog')),
