@@ -15,6 +15,15 @@
             Instructor {{object.author.get_full_name}}
         </p>
         {{object.overview|linebreaks}}
+        {% if request.user.is_authenticated %}
+            <form action="{% url 'edx:student:student_enroll_course' %}" method="post">
+                {% csrf_token %}
+                {{ enrolment_form }}
+                <input type="submit" value="Enroll Now">
+            </form>
+        {% else %}
+            <a href="{% url 'edx:student:student_registration' %}" class="button">Register to Enroll</a>
+        {% endif %}
     </div>
 {% endwith %}
 {% endblock %}

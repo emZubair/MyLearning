@@ -12,6 +12,7 @@ from braces.views import CsrfExemptMixin, JSONRequestResponseMixin
 from .forms import ModuleFormSet
 from .models import Course, Module, Content, Subject
 from .mixins import AuthorCourseMixin, AuthorCourseEditMixin
+from edx.student.views import CourseEnrollForm
 
 
 class ManageCourseListView(AuthorCourseMixin, ListView):
@@ -164,3 +165,8 @@ class CourseListView(TemplateResponseMixin, View):
 class CourseDetailsView(DetailView):
     model = Course
     template_name = 'courses/course/details.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(CourseDetailsView, self).get_context_data(**kwargs)
+        context['enrolment_form'] = CourseEnrollForm(initial={'course': self.object})
+        return context
