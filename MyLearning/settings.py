@@ -41,8 +41,9 @@ CUSTOM_APPS = [
 REQUIRED_APPS = [
     'taggit',
     'embed_video',
-    'django_extensions',
     'easy_thumbnails',
+    'memcache_status',
+    'django_extensions',
 ]
 
 INSTALLED_APPS = [
@@ -61,7 +62,9 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'django.middleware.cache.FetchFromCacheMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -123,6 +126,16 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211',
+    },
+}
+
+CACHE_MIDDLEWARE_ALIAS = 'default'
+CACHE_MIDDLEWARE_TIMEOUT = 15 * 60  # 15 Minutes
+CACHE_MIDDLEWARE_KEY_PREFIX = 'edx'
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/

@@ -13,6 +13,8 @@ from .forms import ModuleFormSet
 from .models import Course, Module, Content, Subject
 from .mixins import AuthorCourseMixin, AuthorCourseEditMixin
 from edx.student.views import CourseEnrollForm
+from edx.common.utils import get_item_from_cache, set_item_in_cache
+from edx.common.constants import KEY_ALL_COURSES
 
 
 class ManageCourseListView(AuthorCourseMixin, ListView):
@@ -148,15 +150,29 @@ class CourseListView(TemplateResponseMixin, View):
 
     def get(self, request, subject=None):
 
-        subjects = Subject.objects.annotate(
-            total_courses=Count('courses')
-        )
+        subjects = get_item_from_cache(KEY_ALL_COURSES)
+
+        if not subjects:
+            subjects = Subject.objects.annotate(
+                total_courses=Count('courses')
+            )
+            set_item_in_cache(KEY_ALL_COURSES, subjects)
         courses = Course.objects.annotate(
             total_modules=Count('modules')
         )
+        all_courses = Course.objects.annotate(total_modules=Count('modules'))
+
         if subject:
             subject = get_object_or_404(Subject, slug=subject)
-            courses = courses.filter(subject=subject)
+            subject_key = f'subject_{subject.id}_courses'
+            courses = get_item_from_cache(subject_key)
+            if not courses:
+                courses = all_courses.filter(subject=subject)
+                set_item_in_cache(subject_key, courses)
+            else:
+                courses = get_item_from_cache(KEY_ALL_COURSES)
+                courses = all_courses
+                set_item_in_cache(KEY_ALL_COURSES, all_courses)
         return self.render_to_response({
             'subjects': subjects, 'courses': courses, 'subject': subject
         })
