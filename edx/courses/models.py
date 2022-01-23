@@ -12,7 +12,7 @@ class Subject(models.Model):
     slug = models.SlugField(max_length=64, unique=True)
 
     class Meta:
-        ordering = ['title',]
+        ordering = ['id',]
 
     def __str__(self):
         return self.title

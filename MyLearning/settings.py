@@ -41,6 +41,7 @@ CUSTOM_APPS = [
 REQUIRED_APPS = [
     'taggit',
     'embed_video',
+    'rest_framework',
     'easy_thumbnails',
     'memcache_status',
     'django_extensions',
@@ -106,6 +107,16 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'bookmarks.account.authentication.EmailAuthenticationBackend'
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ],
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ]
+}
 
 
 # Password validation
