@@ -9,8 +9,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import BasicAuthentication
 
 
+from .permissions import IsEnrolled
 from edx.courses.models import Subject, Course
-from .serializers import SubjectSerializer, CourseSerializer
+from .serializers import SubjectSerializer, CourseSerializer, CourseWithContentSerializer
 
 
 class CourseListView(viewsets.ReadOnlyModelViewSet):
@@ -23,6 +24,11 @@ class CourseListView(viewsets.ReadOnlyModelViewSet):
         course = self.get_object()
         course.students.add(request.user)
         return Response({'enrolled': True})
+
+    @action(detail=True, methods=['get'], serializer_class=CourseWithContentSerializer,
+            permission_classes=[IsAuthenticated, IsEnrolled], authentication_classes=[BasicAuthentication])
+    def contents(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
 
 
 class SubjectListView(generics.ListAPIView):
