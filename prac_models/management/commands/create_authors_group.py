@@ -20,8 +20,6 @@ class Command(BaseCommand):
         course_authors, created = Group.objects.get_or_create(name='CA')
         can_view_book = Permission.objects.get(codename='view_author')
         # ct = ContentType.objects.get_for_model(Book)
-        import pdb
-        pdb.set_trace()
         # permission, _ = Permission.objects.get_or_create(codename='can_add_book',
         #                                               name='Can add books',
         #                                               content_type=ct)
