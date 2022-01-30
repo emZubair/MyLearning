@@ -36,10 +36,12 @@ CUSTOM_APPS = [
     'blog.actions.apps.ActionsConfig',
     'edx.courses.apps.CoursesConfig',
     'edx.student.apps.StudentConfig',
+    'edx.chat.apps.ChatConfig',
 ]
 
 REQUIRED_APPS = [
     'taggit',
+    'channels',
     'embed_video',
     'rest_framework',
     'easy_thumbnails',
@@ -63,9 +65,9 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.cache.UpdateCacheMiddleware',
+    # 'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.cache.FetchFromCacheMiddleware',
+    # 'django.middleware.cache.FetchFromCacheMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -169,6 +171,8 @@ ABSOLUTE_URL_OVERRIDES = {
     'auth.user': lambda u: reverse_lazy('blog:posts:user_details', args=[u.username])
 }
 
+ASGI_APPLICATION = 'MyLearning.routing.application'
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
@@ -186,6 +190,15 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 REDIS_HOST = 'localhost'
 REDIS_PORT = 6379
 REDIS_DB = 0
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [('127.0.0.1', 6379)],
+        },
+    },
+}
 
 try:
     from .local_settings import *  # pylint: disable=wildcard-import
