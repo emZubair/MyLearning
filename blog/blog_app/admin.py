@@ -1,5 +1,5 @@
 from django.contrib import admin
-# from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User, Group
 from .models import Post, Comment
 
 
@@ -20,5 +20,6 @@ class CommentAdmin(admin.ModelAdmin):
     list_filter = ('active', 'created', 'updated')
     search_fields = ('name', 'email', 'body')
 
-# admin.site.unregister(User)
-# admin.site.unregister(Group)
+
+admin.site.unregister(User)
+admin.site.unregister(Group)
