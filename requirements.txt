@@ -1,18 +1,18 @@
-pylint             # Latest stable from PyPI
-pytest==8.4.2      # pytest’s latest major release line
-isort==5.12.0      # isort 5.x is latest stable series
-Pillow==10.5.0     # newest Pillow patch release
-Django==6.0        # major new branch released Dec 2025 :contentReference[oaicite:1]{index=1}
-requests==2.31.0   # latest stable requests
-pydocstyle==6.1.1  # updated from 5.x series
-pycodestyle==2.11.1 # latest known release
-django-taggit==3.1.0 # newer than 2.0 line
-channels-redis==6.0.0 # latest backend for channels :contentReference[oaicite:2]{index=2}
-Markdown==3.5.4    # latest Markdown
-channels==4.3.2    # latest Django Channels stable
-psycopg2==2.9.7    # last psycopg2 patch (recommended psycopg3 for new projects) :contentReference[oaicite:3]{index=3}
-django-braces==1.18.0 # updated minor bump available
-django-embed-video==1.5.1 # latest patch release
-python-memcached==1.59.0 # basically unchanged (no recent major bump)
-django-memcache-status==3.0.0 # latest series release
-djangorestframework==3.16.0 # latest DRF as per Debian PyPI mirror :contentReference[oaicite:4]{index=4}
+pylint==4.0.5
+pytest==9.0.2
+isort==8.0.1
+Pillow==12.2.0
+Django==6.0.3
+requests==2.33.1
+pydocstyle==6.3.0
+pycodestyle==2.14.0
+django-taggit==6.1.0
+channels-redis==4.3.0
+Markdown==3.10.2
+channels==4.3.2
+psycopg2-binary==2.9.11
+django-braces==1.17.0
+django-embed-video==1.4.10
+python-memcached==1.62
+django-memcache-status==2.3
+djangorestframework==3.17.1
