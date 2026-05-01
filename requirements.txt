@@ -10,7 +10,7 @@ django-taggit==6.1.0
 channels-redis==4.3.0
 Markdown==3.10.2
 channels==4.3.2
-psycopg2-binary==2.9.11
+psycopg2-binary==2.9.12
 django-braces==1.17.0
 django-embed-video==1.4.10
 python-memcached==1.62
