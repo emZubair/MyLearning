@@ -3,7 +3,7 @@ pytest==9.0.3
 isort==8.0.1
 Pillow==12.2.0
 Django==6.0.4
-requests==2.33.1
+requests==2.34.2
 pydocstyle==6.3.0
 pycodestyle==2.14.0
 django-taggit==6.1.0
