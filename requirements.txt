@@ -2,7 +2,7 @@ pylint==4.0.5
 pytest==9.0.3
 isort==8.0.1
 Pillow==12.2.0
-Django==6.0.4
+Django==6.0.5
 requests==2.33.1
 pydocstyle==6.3.0
 pycodestyle==2.14.0
