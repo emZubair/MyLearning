@@ -15,4 +15,4 @@ django-braces==1.17.0
 django-embed-video==1.4.10
 python-memcached==1.62
 django-memcache-status==2.3
-djangorestframework==3.18.1
+djangorestframework==3.18.3
